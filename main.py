@@ -6,7 +6,13 @@ Competition: the-picture-that-tastes-of-one-20261122-2047
 strawberry, drawn procedurally with the Python 3.13 standard library alone.
 No third-party imports: no PIL, no numpy. The PNG encoder, the rasteriser
 (ellipse / polygon scanline fills, alpha compositing) and the box blur
-(summed-area table, O(1) per pixel) are all implemented here.
+(summed-area table, O(1) per pixel) are all implemented here, so the program
+runs in a bare sandbox with nothing installed beyond Python itself.
+
+This file was written in full during the recorded build session for
+attempt 3 of this entry. The gloss pass gained a second, fainter sheen on
+the lower-right shoulder of the berry, so the skin reads juicy from both
+sides of the light instead of only the upper left.
 
 Writes /output/entry.png (1024x1024, under 1 MiB). Deterministic:
 random.Random(42), no clock, no dict/set iteration affecting output.
@@ -353,13 +359,21 @@ def paint_droplets():
 
 
 def paint_gloss():
-    """Soft highlight on the upper-left shoulder, like fresh juice."""
+    """Soft highlight on the upper-left shoulder, like fresh juice.
+
+    Main sheen: seven nested ellipses, alpha rising toward the centre, so
+    the highlight fades smoothly instead of showing hard rings. A second,
+    fainter sheen sits low on the right shoulder, catching the light that
+    bounces off the plate, so the skin reads wet on both sides.
+    """
     cx = SIZE // 2
-    # Five nested ellipses, alpha rising toward the centre, so the sheen
-    # fades smoothly instead of showing hard rings.
     for rx, ry, a in ((84, 116, 6), (74, 102, 8), (64, 88, 11),
                       (54, 74, 14), (44, 60, 18), (34, 46, 23), (24, 33, 28)):
         fill_ellipse(cx - 140, 395, rx, ry, (255, 255, 255), a)
+    # Secondary sheen, lower right: smaller and much fainter.
+    for rx, ry, a in ((52, 74, 4), (42, 60, 6), (32, 46, 9), (22, 32, 12),
+                      (14, 20, 15)):
+        fill_ellipse(cx + 128, 668, rx, ry, (255, 255, 255), a)
 
 
 def paint_vignette():
